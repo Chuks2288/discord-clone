@@ -1,5 +1,6 @@
 "use client"
 
+import qs from "query-string";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -35,11 +36,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 
-const DeleteServerModal = () => {
+const DeleteChannelModal = () => {
 
     const { isOpen, onClose, type, data } = useModal();
-    const isModalOpen = isOpen && type === "deleteServer"
-    const { server } = data;
+    const isModalOpen = isOpen && type === "deleteChannel"
+    const { server, channel } = data;
+
 
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -48,14 +50,22 @@ const DeleteServerModal = () => {
         try {
             setIsLoading(true);
 
-            await axios.delete(`/api/servers/${server?.id}`);
+            const url = qs.stringifyUrl({
+                url: `/api/channels/${channel?.id}`,
+                query: {
+                    serverId: server?.id,
+                }
+            });
+
+
+            await axios.delete(url);
             onClose();
-            toast.success("You have left the server")
+            toast.success("Channel deleted successfully");
             router.refresh();
-            router.push("/");
+            router.push(`/servers/${server?.id}`);
         } catch (error) {
             console.log(error);
-            toast.error("Unable to delete server, please try again!!");
+            toast.error("Unable to delete channel, please try again!!");
         } finally {
             setIsLoading(false);
         }
@@ -67,12 +77,12 @@ const DeleteServerModal = () => {
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center">
-                        Delete Server
+                        Delete Channel
                     </DialogTitle>
                     <DialogDescription className="text-center text-zinc-500">
-                        Are you sure you want to delete ? <br />
+                        Are you sure you want to delete ?<br />
                         <span className="font-bold text-indigo-500">
-                            {server?.name}
+                            {channel?.name}
                         </span>  will be permanently deleted.
                     </DialogDescription>
                 </DialogHeader>
@@ -107,4 +117,4 @@ const DeleteServerModal = () => {
     )
 }
 
-export default DeleteServerModal;
+export default DeleteChannelModal;

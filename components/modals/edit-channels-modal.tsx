@@ -30,7 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal-store";
 import toast from "react-hot-toast";
 
@@ -57,56 +57,53 @@ const formSchema = z.object({
     type: z.nativeEnum(ChannelType)
 })
 
-const CreateChannelModal = () => {
+const EditChannelModal = () => {
 
     const router = useRouter();
-    const params = useParams();
 
     const { isOpen, onClose, type, data } = useModal();
 
-    const isModalOpen = isOpen && type === "createChannels";
+    const isModalOpen = isOpen && type === "editChannel";
 
-    const { channelType } = data;
+    const { channel, server } = data;
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: ({
             name: "",
-            type: channelType || ChannelType.TEXT,
+            type: channel?.type || ChannelType.TEXT,
         })
     })
 
     const isLoading = form.formState.isSubmitting;
 
-
     useEffect(() => {
-        if (channelType) {
-            form.setValue("type", channelType);
-        } else {
-            form.setValue("type", ChannelType.TEXT)
+        if (channel) {
+            form.setValue("name", channel.name);
+            form.setValue("type", channel.type);
         }
-    }, [channelType, form]);
+    }, [channel, form]);
+
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         // console.log(values);
 
         try {
             const url = qs.stringifyUrl({
-                url: "/api/channels",
+                url: `/api/channels/${channel?.id}`,
                 query: {
-                    serverId: params?.serverId
+                    serverId: server?.id,
                 }
             })
 
-            await axios.post(url, values);
+            await axios.patch(url, values);
 
-            form.reset();
             onClose();
             router.refresh();
-            toast.success(`${name} Created Successfully`);
+            toast.success("Updated successfully");
         } catch (error) {
             console.log(error);
-            toast.error("Error Creating Channel")
+            toast.error("Error updating Channel");
         }
     }
 
@@ -120,7 +117,7 @@ const CreateChannelModal = () => {
             <DialogContent className="bg-white text-black p-0 overflow-hidden">
                 <DialogHeader className="pt-8 px-6">
                     <DialogTitle className="text-2xl text-center">
-                        Create Channel
+                        Edit Channel
                     </DialogTitle>
                 </DialogHeader>
 
@@ -195,7 +192,7 @@ const CreateChannelModal = () => {
                                             <Loader2
                                                 className="animate-spin w-5 h-5"
                                             />
-                                        ) : "Create"
+                                        ) : "Save"
 
                                 }
                                 disabled={isLoading}
@@ -211,4 +208,4 @@ const CreateChannelModal = () => {
     )
 }
 
-export default CreateChannelModal;
+export default EditChannelModal;
