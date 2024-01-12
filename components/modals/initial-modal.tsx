@@ -78,7 +78,7 @@ const InitialModal = () => {
     const isLoading = form.formState.isSubmitting;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        // console.log(values);
 
         try {
             await axios.post("/api/servers", values)
@@ -148,7 +148,6 @@ const InitialModal = () => {
                                     </FormItem>
                                 )}
                             />
-
                         </div>
 
                         <DialogFooter className="bg-gray-100 px-6 py-4">

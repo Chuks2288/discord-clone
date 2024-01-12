@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Smile } from "lucide-react";
 import { useModal } from "@/hooks/use-modal-store";
 import EmojiPicker from "../emoji-picker";
+import { useRouter } from "next/navigation";
 
 interface ChatInputProps {
     apiUrl: string
@@ -35,6 +36,8 @@ const ChatInput = ({
     name,
     type
 }: ChatInputProps) => {
+
+    const router = useRouter();
 
     const { onOpen } = useModal();
 
@@ -55,6 +58,9 @@ const ChatInput = ({
             })
 
             await axios.post(url, values);
+
+            form.reset();
+            router.refresh();
         } catch (error) {
             console.log(error);
         }
@@ -89,7 +95,9 @@ const ChatInput = ({
                                     />
 
                                     <div className="absolute top-7 right-8 cursor-pointer">
-                                        <EmojiPicker />
+                                        <EmojiPicker
+                                            onChange={(emoji: string) => field.onChange(`${field.value} ${emoji}`)}
+                                        />
                                     </div>
                                 </div>
                             </FormControl>

@@ -80,7 +80,5 @@ export const FileUpload = ({
                 toast.error("Upload Error");
             }}
         />
-
-
     )
 }
