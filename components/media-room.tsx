@@ -39,7 +39,7 @@ export const MediaRoom = ({
                 const data = await resp.json();
                 setToken(data.token);
             } catch (error) {
-                console.log(e);
+                console.log(error);
             }
         })()
     }, [user?.firstName, user?.lastName, chatId]);
